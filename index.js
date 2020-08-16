@@ -56,7 +56,19 @@ function draw_line(x1, y1, x2, y2, cssColor) {
 function draw_minimap(){
     ctx.fillStyle = 'rgba(0,0,0,0.5)';
     ctx.fillRect(0, 0, 120, 120);
-    // for(let i=0;i<)
+   
+    for(let i=0;i<game_map.length;i++){
+        for(let j=0;j<game_map[0].length;j++){
+            // console.log(i,j)
+            if(game_map[i][j]===2){
+                ctx.fillStyle = 'rgb(255,255,255)';
+                ctx.fillRect(i*12, j*12, 10, 10);
+            }
+        }
+    }
+    ctx.fillStyle = 'rgb(255,0,0)';
+    ctx.fillRect(Math.floor(player.y*12), Math.floor(player.x*12), 10, 10);
+
 }
 
 function rayCasting() {
