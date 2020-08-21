@@ -9,7 +9,7 @@ const FOV=60;
 const precision=90
 const player = {
     x: 2, y: 2, angle: 0,
-    radius: 10,
+    radius: 1,
     speed: {
         movement: 0.1,
         rotation: 2.5
@@ -53,21 +53,28 @@ function draw_line(x1, y1, x2, y2, cssColor) {
     ctx.stroke();
 }
 
-function draw_minimap(){
+function draw_minimap() {
     ctx.fillStyle = 'rgba(0,0,0,0.5)';
     ctx.fillRect(0, 0, 120, 120);
-   
-    for(let i=0;i<game_map.length;i++){
-        for(let j=0;j<game_map[0].length;j++){
+
+    for (let i = 0; i < game_map.length; i++) {
+        for (let j = 0; j < game_map[0].length; j++) {
             // console.log(i,j)
-            if(game_map[i][j]===2){
+            if (game_map[i][j] === 2) {
                 ctx.fillStyle = 'rgb(255,255,255)';
-                ctx.fillRect(i*12, j*12, 10, 10);
+                ctx.fillRect(i * 12, j * 12, 10, 10);
             }
         }
     }
     ctx.fillStyle = 'rgb(255,0,0)';
-    ctx.fillRect(Math.floor(player.y*12), Math.floor(player.x*12), 10, 10);
+    ctx.fillRect(Math.floor(player.y * 12), Math.floor(player.x * 12), 10, 10);
+    const player_x = Math.floor(player.x * 12) + (player.radius / 2 * 12)
+    const player_y = Math.floor(player.y * 12) + (player.radius / 2 * 12)
+    ctx.moveTo(player_y, player_x);
+    const r = 100
+    ctx.strokeStyle = "#FF0000";
+    ctx.lineTo(player_y + r * Math.cos(degrees_to_radians(90 - player.angle)), player_x + r * Math.sin(90 - degrees_to_radians(player.angle)));
+    ctx.stroke();
 
 }
 
@@ -76,18 +83,18 @@ function rayCasting() {
     for(let rayCount = 0; rayCount < projection_width; rayCount++) {
         
         // Ray data
-        let ray = {
+        const ray = {
             x: player.x,
             y: player.y
         }
 
         // Ray path incrementers
-        let rayCos = Math.cos(degrees_to_radians(rayAngle)) / precision;
-        let raySin = Math.sin(degrees_to_radians(rayAngle)) / precision;
+        const rayCos = Math.cos(degrees_to_radians(rayAngle)) / precision;
+        const raySin = Math.sin(degrees_to_radians(rayAngle)) / precision;
         
         // Wall finder
         let wall = 0;
-        while(wall == 0) {
+        while(wall === 0) {
             ray.x += rayCos;
             ray.y += raySin;
             wall = game_map[Math.floor(ray.y)][Math.floor(ray.x)];
@@ -100,7 +107,7 @@ function rayCasting() {
         distance = distance * Math.cos(degrees_to_radians(rayAngle - player.angle));
 
         // Wall height
-        let wallHeight = Math.floor(projection_half_height / distance);
+        const wallHeight = Math.floor(projection_half_height / distance);
 
         draw_line(rayCount, 0, rayCount, projection_half_height - wallHeight, "black");
         draw_line(rayCount, projection_half_height + wallHeight, rayCount, projection_height, "rgb(95, 87, 79)");
@@ -118,29 +125,29 @@ function clearScreen() {
  
 function movePlayer() {
     if(w_pressed) {
-        let playerCos = Math.cos(degrees_to_radians(player.angle)) * player.speed.movement;
-        let playerSin = Math.sin(degrees_to_radians(player.angle)) * player.speed.movement;
-        let newX = player.x + playerCos;
-        let newY = player.y + playerSin;
-        let checkX = Math.floor(newX + playerCos * player.radius);
-        let checkY = Math.floor(newY + playerSin * player.radius);
+        const playerCos = Math.cos(degrees_to_radians(player.angle)) * player.speed.movement;
+        const playerSin = Math.sin(degrees_to_radians(player.angle)) * player.speed.movement;
+        const newX = player.x + playerCos;
+        const newY = player.y + playerSin;
+        const checkX = Math.floor(newX + playerCos * player.radius);
+        const checkY = Math.floor(newY + playerSin * player.radius);
 
         // Collision detection
-        if(game_map[checkY][Math.floor(player.x)] == 0) {
+        if(game_map[checkY][Math.floor(player.x)] === 0) {
             player.y = newY;
         }
-        if(game_map[Math.floor(player.y)][checkX] == 0) {
+        if(game_map[Math.floor(player.y)][checkX] === 0) {
             player.x = newX;
         } 
 
     }
     if(s_pressed) {
-        let playerCos = Math.cos(degrees_to_radians(player.angle)) * player.speed.movement;
-        let playerSin = Math.sin(degrees_to_radians(player.angle)) * player.speed.movement;
-        let newX = player.x - playerCos;
-        let newY = player.y - playerSin;
-        let checkX = Math.floor(newX - playerCos * player.radius);
-        let checkY = Math.floor(newY - playerSin * player.radius);
+        const playerCos = Math.cos(degrees_to_radians(player.angle)) * player.speed.movement;
+        const playerSin = Math.sin(degrees_to_radians(player.angle)) * player.speed.movement;
+        const newX = player.x - playerCos;
+        const newY = player.y - playerSin;
+        const checkX = Math.floor(newX - playerCos * player.radius);
+        const checkY = Math.floor(newY - playerSin * player.radius);
 
         // Collision detection
         if(game_map[checkY][Math.floor(player.x)] == 0) {
@@ -206,5 +213,6 @@ function game_loop() {
         movePlayer();
         rayCasting();
         draw_minimap()
+        console.log(player.y,player.x)
 }
 window.requestAnimationFrame(game_loop);
