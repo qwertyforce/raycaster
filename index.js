@@ -73,7 +73,7 @@ function draw_minimap() {
     ctx.moveTo(player_y, player_x);
     const r = 100
     ctx.strokeStyle = "#FF0000";
-    ctx.lineTo(player_y + r * Math.cos(degrees_to_radians(90 - player.angle)), player_x + r * Math.sin(90 - degrees_to_radians(player.angle)));
+    ctx.lineTo(player_y + r * Math.cos(degrees_to_radians(90-player.angle)), player_x + r * Math.sin(degrees_to_radians(90-player.angle)));
     ctx.stroke();
 
 }
