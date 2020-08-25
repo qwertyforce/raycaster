@@ -45,8 +45,8 @@ function degrees_to_radians(degree) {
     return (degree * Math.PI) / 180;
 }
 
-function draw_line(x1, y1, x2, y2, cssColor) {
-    ctx.strokeStyle = cssColor;
+function draw_line(x1, y1, x2, y2, color) {
+    ctx.strokeStyle = color;
     ctx.beginPath();
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
@@ -79,41 +79,29 @@ function draw_minimap() {
 }
 
 function rayCasting() {
-    let rayAngle = player.angle - HALF_FOV;
-    for(let rayCount = 0; rayCount < projection_width; rayCount++) {
-        
-        // Ray data
-        const ray = {
-            x: player.x,
-            y: player.y
+    let ray_angle = player.angle - HALF_FOV;
+    for (let ray_count = 0; ray_count < projection_width; ray_count++) {
+        let ray_x = player.x
+        let ray_y = player.y
+        const ray_cos = Math.cos(degrees_to_radians(ray_angle)) / precision;
+        const ray_sin = Math.sin(degrees_to_radians(ray_angle)) / precision;
+
+        let obstacle = 0;
+        while (obstacle === 0) {
+            ray_x += ray_cos;
+            ray_y += ray_sin;
+            obstacle = game_map[Math.floor(ray_y)][Math.floor(ray_x)];
         }
-
-        // Ray path incrementers
-        const rayCos = Math.cos(degrees_to_radians(rayAngle)) / precision;
-        const raySin = Math.sin(degrees_to_radians(rayAngle)) / precision;
-        
-        // Wall finder
-        let wall = 0;
-        while(wall === 0) {
-            ray.x += rayCos;
-            ray.y += raySin;
-            wall = game_map[Math.floor(ray.y)][Math.floor(ray.x)];
-        }
-
-        // Pythagoras theorem
-        let distance = Math.sqrt(Math.pow(player.x - ray.x, 2) + Math.pow(player.y - ray.y, 2));
-
+        let distance = Math.sqrt(Math.pow(player.x - ray_x, 2) + Math.pow(player.y - ray_y, 2));
         // Fish eye fix
-        distance = distance * Math.cos(degrees_to_radians(rayAngle - player.angle));
+        distance = distance * Math.cos(degrees_to_radians(ray_angle - player.angle));
+        const wall_height = Math.floor(projection_half_height / distance);
 
-        // Wall height
-        const wallHeight = Math.floor(projection_half_height / distance);
+        draw_line(ray_count, 0, ray_count, projection_half_height - wall_height, "#1b6dfa");
+       // draw_line(ray_count, projection_half_height - wall_height, ray_count, projection_half_height + wall_height, "#9395a3");
+        draw_line(ray_count, projection_half_height + wall_height, ray_count, projection_height, "#3d424a");
 
-        draw_line(rayCount, 0, rayCount, projection_half_height - wallHeight, "black");
-        draw_line(rayCount, projection_half_height + wallHeight, rayCount, projection_height, "rgb(95, 87, 79)");
-
-        // Increment
-        rayAngle += angle_increment;
+        ray_angle += angle_increment;
     }
 }
 
