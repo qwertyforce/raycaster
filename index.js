@@ -1,7 +1,6 @@
-// Calculated data
 const scale=1
-const height=720
-const width=1280
+const height=720/2
+const width=1280/2
 const projection_height=height / scale
 const projection_width=width / scale
 const projection_half_height=projection_height/2
